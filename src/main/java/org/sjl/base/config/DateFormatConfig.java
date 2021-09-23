@@ -1,4 +1,4 @@
-package org.sjl.config;
+package org.sjl.base.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

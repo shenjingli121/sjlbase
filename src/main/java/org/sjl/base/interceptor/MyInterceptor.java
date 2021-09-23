@@ -1,4 +1,4 @@
-package org.sjl.interceptor;
+package org.sjl.base.interceptor;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
