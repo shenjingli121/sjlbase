@@ -10,9 +10,20 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @TableName("sys_user")
 public class SysUser extends BaseEntity {
-
-  private String name;
-  private String userName;
-  private String password;
-  private String phone;
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 用户名
+     */
+    private String userName;
+    /**
+     * 密码
+     */
+    private String password;
+    /**
+     * 手机号
+     */
+    private String phone;
 }

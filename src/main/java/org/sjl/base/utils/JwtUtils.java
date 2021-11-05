@@ -1,104 +1,95 @@
 package org.sjl.base.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.joda.time.DateTime;
+import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
+import org.sjl.base.entity.JWTEntity;
+import org.sjl.base.entity.JWTHeader;
+import org.sjl.base.entity.Payload;
+import org.springframework.util.ObjectUtils;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Base64;
-import java.util.UUID;
+import java.util.HashMap;
 
 /**
- * @author: 黑马程序员
- * 生成token以及校验token相关方法
+ *
  */
+@Slf4j
 public class JwtUtils {
-
-    private static final String JWT_PAYLOAD_USER_KEY = "user";
-
+    private static final String ALG = "alg";
+    private static final String TYP = "typ";
+    private static final String CLAIM_TYPE_ONE = "user";
+    public static Long TIMEOUT = 10l;
     /**
-     * 公钥加密token
+     * 生成token
      *
-     * @param userInfo   载荷中的数据
-     * @param publicKey 私钥
-     * @param expire     过期时间，单位分钟
-     * @return JWT
+     * @param o
+     * @return
      */
-    public static String generateTokenExpireInMinutes(Object userInfo, PrivateKey publicKey, int expire) {
+    public static String createToken(Object o) {
+        if (ObjectUtils.isEmpty(o)) {
+            log.error("生成Token时，传过来的载体为空。");
+            return "";
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(ALG, SignatureAlgorithm.RS256);
+        map.put(TYP, Header.JWT_TYPE);
         return Jwts.builder()
-                .claim(JWT_PAYLOAD_USER_KEY, JSONObject.toJSONString(userInfo))
-                .setId(createJTI())
-                .setExpiration(DateTime.now().plusMinutes(expire).toDate())
-                .signWith(publicKey, SignatureAlgorithm.RS256)
+                .setHeader(map)
+                .claim(CLAIM_TYPE_ONE, JSONObject.toJSONString(o))
+                .signWith(RsaUtils.PRIVATE_KEY, SignatureAlgorithm.RS256)
                 .compact();
     }
 
     /**
-     * 公钥加密token
-     *
-     * @param userInfo   载荷中的数据
-     * @param publicKey 私钥
-     * @param expire     过期时间，单位秒
-     * @return JWT
+     * 获取token 的header
      */
-    public static String generateTokenExpireInSeconds(Object userInfo, PublicKey publicKey, int expire) {
-        return Jwts.builder()
-                .claim(JWT_PAYLOAD_USER_KEY, JSONObject.toJSONString(userInfo))
-                .setId(createJTI())
-                .setExpiration(DateTime.now().plusSeconds(expire).toDate())
-                .signWith(publicKey, SignatureAlgorithm.RS256)
-                .compact();
+    public static JWTHeader getTokenHeader(String token) {
+        Jws<Claims> jwsClaims = getJwsClaims(token);
+        JwsHeader header = jwsClaims.getHeader();
+        JWTHeader jwtHeader = new JWTHeader();
+        jwtHeader.setAlg(header.getAlgorithm());
+        jwtHeader.setTyp(header.getType());
+        return jwtHeader;
     }
 
     /**
-     * 私钥解析token
-     *
-     * @param token     用户请求中的token
-     * @param privateKey 公钥
-     * @return Jws<Claims>
+     * 获取token 载体 payload
      */
-    private static Jws<Claims> parserToken(String token, PrivateKey privateKey) {
-        return Jwts.parser().setSigningKey(privateKey).parseClaimsJws(token);
+    public static Payload getPayload(String token) {
+        Jws<Claims> jwsClaims = getJwsClaims(token);
+        Claims body = jwsClaims.getBody();
+        return JSONObject.parseObject(body.get(CLAIM_TYPE_ONE).toString(), Payload.class);
     }
 
-    private static String createJTI() {
-        return new String(Base64.getEncoder().encode(UUID.randomUUID().toString().getBytes()));
+
+    /**
+     * 获取token种的签名
+     */
+    public static String getSignature(String token) {
+        Jws<Claims> jwsClaims = getJwsClaims(token);
+        return jwsClaims.getSignature();
     }
-//
-//    /**
-//     * 获取token中的用户信息
-//     *
-//     * @param token     用户请求中的令牌
-//     * @param publicKey 公钥
-//     * @return 用户信息
-//     */
-//    public static <T> Payload<T> getInfoFromToken(String token, PublicKey publicKey, Class<T> userType) {
-//        Jws<Claims> claimsJws = parserToken(token, publicKey);
-//        Claims body = claimsJws.getBody();
-//        Payload<T> claims = new Payload<>();
-//        claims.setId(body.getId());
-//        claims.setUserInfo(JsonUtils.toBean(body.get(JWT_PAYLOAD_USER_KEY).toString(), userType));
-//        claims.setExpiration(body.getExpiration());
-//        return claims;
-//    }
-//
-//    /**
-//     * 获取token中的载荷信息
-//     *
-//     * @param token     用户请求中的令牌
-//     * @param publicKey 公钥
-//     * @return 用户信息
-//     */
-//    public static <T> Payload<T> getInfoFromToken(String token, PublicKey publicKey) {
-//        Jws<Claims> claimsJws = parserToken(token, publicKey);
-//        Claims body = claimsJws.getBody();
-//        Payload<T> claims = new Payload<>();
-//        claims.setId(body.getId());
-//        claims.setExpiration(body.getExpiration());
-//        return claims;
-//    }
+
+    /**
+     * 验证token签名
+     */
+    public static JWTEntity parseToken(String token) {
+        JWTEntity jwtEntity = new JWTEntity();
+        jwtEntity.setJwtHeader(getTokenHeader(token));
+        jwtEntity.setPayload(getPayload(token));
+        jwtEntity.setSignature(getSignature(token));
+        return jwtEntity;
+    }
+
+
+    public static HashMap<String, Object> verifyToken(String token) {
+        return null;
+    }
+
+    /**
+     * 解析token
+     */
+    private static Jws<Claims> getJwsClaims(String token) {
+        return Jwts.parser().setSigningKey(RsaUtils.PUBLIC_KEY).parseClaimsJws(token);
+    }
 }

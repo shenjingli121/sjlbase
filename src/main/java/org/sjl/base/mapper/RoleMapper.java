@@ -11,6 +11,6 @@ import java.util.List;
 public interface RoleMapper extends BaseMapper<RoleEntity> {
 
 
-    @Select("select * from sys_role left join sys_user_role on sys_role.id = sys_user_role.role_id where sys_user_role.id = #{id}")
+    @Select("select sys_role.* from sys_role left join sys_user_role on sys_role.id = sys_user_role.role_id where sys_user_role.user_id = #{id}")
     List<RoleEntity> getRoleByUserId(Long id);
 }
