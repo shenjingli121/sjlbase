@@ -62,10 +62,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * 配置哪些请求不拦截
      */
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/index**", "/api/**", "/swagger-ui.html/**");
-
-    }
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        web.ignoring().antMatchers("/index**", "/api/**", "/swagger-ui.html/**");
+//
+//    }
 
 }

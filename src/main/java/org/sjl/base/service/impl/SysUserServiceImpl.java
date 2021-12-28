@@ -1,7 +1,7 @@
 package org.sjl.base.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.sjl.base.entity.SysUser;
+import org.sjl.base.entity.SysUserEntity;
 import org.sjl.base.mapper.SysUserMapper;
 import org.sjl.base.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity> implements SysUserService {
 
     @Override
     public SysUserMapper getBaseMapper() {
@@ -24,7 +24,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @return
      */
     @Override
-    public SysUser getUserByUsernameToken(String username) {
+    public SysUserEntity getUserByUsernameToken(String username) {
         return getBaseMapper().getUserByUsernameToken(username);
     }
 }

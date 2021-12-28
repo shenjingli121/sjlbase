@@ -10,6 +10,12 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 public class RoleEntity extends BaseEntity {
-
+    /**
+     * 角色名称
+     */
     private String roleName;
+    /**
+     * 角色key
+     */
+    private String roleValue;
 }

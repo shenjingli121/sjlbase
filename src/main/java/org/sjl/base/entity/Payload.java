@@ -10,5 +10,5 @@ public class Payload {
     private Long userId;
     private String username;
     private String phone;
-    private List<Long> role;
+    private List<String> role;
 }

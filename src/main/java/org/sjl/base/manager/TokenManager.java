@@ -32,11 +32,11 @@ public class TokenManager {
      */
     public String createToken(String username) {
         // 获取用户信息
-        SysUser user = sysUserService.getUserByUsernameToken(username);
+        SysUserEntity user = sysUserService.getUserByUsernameToken(username);
         Long id = user.getId();
         // 获取用户角色
         List<RoleEntity> roles = roleService.getRoleListByUserId(id);
-        List<Long> roleList = roles.stream().map(o -> o.getId()).collect(Collectors.toList());
+        List<String> roleList = roles.stream().map(o -> o.getRoleValue()).collect(Collectors.toList());
         Payload payload = getNewPayload(user, roleList);
         return JwtUtils.createToken(payload);
     }
@@ -65,18 +65,21 @@ public class TokenManager {
      * @param token
      * @return
      */
-    public boolean verifyToken(String token) {
+    public String verifyToken(String token) {
         JWTEntity jwtEntity = JwtUtils.parseToken(token);
         String username = jwtEntity.getPayload().getUsername();
         String token1 = createToken(username);
         String signature = JwtUtils.getSignature(token1);
-        return signature.equals(jwtEntity.getSignature());
+        if (signature.equals(jwtEntity.getSignature())) {
+            return token1;
+        }
+        return null;
     }
 
     /**
      * 生成载体
      */
-    private Payload getNewPayload(SysUser user, List<Long> roleList) {
+    private Payload getNewPayload(SysUserEntity user, List<String> roleList) {
         Payload payload = new Payload();
         payload.setPhone(user.getPhone());
         payload.setRole(roleList);
@@ -86,4 +89,9 @@ public class TokenManager {
     }
 
 
+    public boolean verifyAuthByRole(String token, String uri) {
+        Payload payload = JwtUtils.getPayload(token);
+
+        return false;
+    }
 }

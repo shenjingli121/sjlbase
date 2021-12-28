@@ -2,7 +2,7 @@ package org.sjl.base.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.sjl.base.entity.RoleEntity;
-import org.sjl.base.entity.SysUser;
+import org.sjl.base.entity.SysUserEntity;
 import org.sjl.base.mapper.RoleMapper;
 import org.sjl.base.mapper.SysUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +31,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+        QueryWrapper<SysUserEntity> wrapper = new QueryWrapper<>();
         wrapper.eq("user_name", username);
-        SysUser sysUser = sysUserMapper.selectOne(wrapper);
+        SysUserEntity sysUser = sysUserMapper.selectOne(wrapper);
         List<RoleEntity> roleList = roleMapper.getRoleByUserId(sysUser.getId());
-        String collect = roleList.stream().map(o -> o.getId().toString()).collect(Collectors.joining(","));
+        String collect = roleList.stream().map(RoleEntity::getRoleValue).collect(Collectors.joining(","));
         List<GrantedAuthority> role = AuthorityUtils.commaSeparatedStringToAuthorityList(collect);
 
         return new User(sysUser.getUserName(), passwordEncoder.encode(sysUser.getPassword()), role);

@@ -9,7 +9,7 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @TableName("sys_user")
-public class SysUser extends BaseEntity {
+public class SysUserEntity extends BaseEntity {
     /**
      * 姓名
      */

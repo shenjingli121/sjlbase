@@ -3,7 +3,7 @@ package org.sjl.base.controller.login;
 import org.sjl.base.entity.HttpEntity;
 
 
-import org.sjl.base.entity.SysUser;
+import org.sjl.base.entity.SysUserEntity;
 import org.sjl.base.service.RoleService;
 import org.sjl.base.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,9 @@ public class LoginController {
     @Autowired
     private RoleService roleService;
     @PostMapping
-    public HttpEntity<SysUser> login(@RequestBody SysUser sysUser, HttpServletResponse response) {
+    public HttpEntity<SysUserEntity> login(@RequestBody SysUserEntity sysUser, HttpServletResponse response) {
 
-        HttpEntity<SysUser> httpEntity = new HttpEntity<>();
+        HttpEntity<SysUserEntity> httpEntity = new HttpEntity<>();
 //        sysUserService.
         return httpEntity;
     }
